@@ -8,34 +8,87 @@ import {
     Image,
     ScrollView,
     Dimensions,
-    FlatList
+    FlatList,
+    Alert
         } from 'react-native';
+
+import Swipeout from 'react-native-swipeout';
 import FlatListData from '../data/FlatList';
 
 class ListItemCOmponent extends Component{
+    constructor(props){
+        super(props);
+        this.state={
+            activeRowKey:null
+        }
+    }
     render(){
+        const swipeSettings = {
+            autoClose:true,
+            onClose:(secId, rowId, direction)=>{
+                if(this.state.activeRowKey!==null){
+                    this.setState({
+                        activeRowKey:null
+                    });
+                }
+            },
+            onOpen:(secId, rowId, direction)=>{
+                this.setState({
+                    activeRowKey:this.props.item.key
+                });
+            },
+            right:[
+                {
+                    onPress:()=>{
+                        const deletingRow = this.state.activeRowKey;
+                        Alert.alert(
+                            'Alert',
+                            'Are u sure you want to delete?',
+                            [
+                                {text:'No', onPress:()=>console.log('Cancel Pressed'), style:'cancel'},
+                                {text:'Yes', onPress: ()=>{
+                                    FlatListData.splice(this.props.index, 1);
+                                    //Rfresh!
+                                    this.props.parentFlatList.refreshFlatList(deletingRow);
+                                }},
+                            ],
+                            {cancelable:true}
+                        );
+                    },
+                    text:'Delete', type:'delete'
+                }
+            ],
+            rowId:this.props.index,
+            sectionId:1
+
+        }
         return(
-            <View 
-                style={{
-                    flex:1,
-                    flexDirection:'row',
-                    backgroundColor: 'mediumseagreen',
-                    borderBottomColor:'white',
-                    borderBottomWidth:1
-                }}
+            <Swipeout
+                {...swipeSettings}
             >
-                <Image
-                    source={{uri:this.props.item.image}}
-                    style={{width:100,height:100, margin:5}}
-                />
-                <View
-                    style={{flex:1, flexDirection:'column'}}
+                <View 
+                    style={{
+                        flex:1,
+                        flexDirection:'row',
+                        backgroundColor: 'mediumseagreen',
+                        borderBottomColor:'white',
+                        borderBottomWidth:1
+                    }}
                 >
-                    <Text style={styles.item}>{this.props.item.name}</Text>
-                    <Text style={styles.item}>{this.props.item.title}</Text>
+                    <Image
+                        source={{uri:this.props.item.image}}
+                        style={{width:100,height:100, margin:5}}
+                    />
+                    <View
+                        style={{flex:1, flexDirection:'column'}}
+                    >
+                        <Text style={styles.item}>{this.props.item.name}</Text>
+                        <Text style={styles.item}>{this.props.item.title}</Text>
+                    </View>
+                    
                 </View>
-                
-            </View>
+            </Swipeout>
+            
         );
     }
 }
@@ -49,6 +102,19 @@ const styles = StyleSheet.create({
 })
 
 export default class FlatListView extends Component{
+    constructor(props){
+        super(props);
+        this.state={
+            deleteRowKey:null
+        }
+    }
+    refreshFlatList = (delKey) => {
+        this.setState((prevState)=>{
+            return {
+                deleteRowKey: delKey
+            }
+        })
+    }
     render(){
         return(
             <View style={{flex:1}}>
@@ -56,7 +122,7 @@ export default class FlatListView extends Component{
                     data={FlatListData}
                     renderItem={({item,index})=>{
                         return(
-                            <ListItemCOmponent item={item} index={index}/>
+                            <ListItemCOmponent item={item} index={index} parentFlatList = {this}/>
                         );
                     }}
                 ></FlatList>
