@@ -9,7 +9,9 @@ import {
     ScrollView,
     Dimensions,
     FlatList,
-    Alert
+    Alert,
+    Platform,
+    TouchableHighlight
         } from 'react-native';
 
 import Swipeout from 'react-native-swipeout';
@@ -115,9 +117,32 @@ export default class FlatListView extends Component{
             }
         })
     }
+    _onPressAdd(){
+        alert('Add');
+    }
     render(){
         return(
-            <View style={{flex:1}}>
+            <View style={{flex:1, marginTop: Platform.OS === 'ios' ? 34 : 0}}>
+                <View
+                    style={{
+                        backgroundColor:'tomato',
+                        flexDirection:'row',
+                        justifyContent:'flex-end',
+                        alignItems:'center',
+                        height:64
+                    }}
+                >
+                    <TouchableHighlight
+                        style={{marginRight:10}}
+                        underlayColor='tomato'
+                        onPress={this._onPressAdd}
+                    >
+                        <Image
+                            style={{width:35, height:35}}
+                            source={require('../img/add.png')}
+                        />
+                    </TouchableHighlight>
+                </View>
                 <FlatList
                     data={FlatListData}
                     renderItem={({item,index})=>{
