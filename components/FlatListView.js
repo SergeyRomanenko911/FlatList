@@ -16,6 +16,7 @@ import {
 
 import Swipeout from 'react-native-swipeout';
 import FlatListData from '../data/FlatList';
+import AddModal from "./AddModal";
 
 class ListItemCOmponent extends Component{
     constructor(props){
@@ -50,7 +51,7 @@ class ListItemCOmponent extends Component{
                                 {text:'No', onPress:()=>console.log('Cancel Pressed'), style:'cancel'},
                                 {text:'Yes', onPress: ()=>{
                                     FlatListData.splice(this.props.index, 1);
-                                    //Rfresh!
+                                    //Refresh!
                                     this.props.parentFlatList.refreshFlatList(deletingRow);
                                 }},
                             ],
@@ -63,7 +64,7 @@ class ListItemCOmponent extends Component{
             rowId:this.props.index,
             sectionId:1
 
-        }
+        };
         return(
             <Swipeout
                 {...swipeSettings}
@@ -101,14 +102,15 @@ const styles = StyleSheet.create({
         padding:18,
         fontSize:16,
     }
-})
+});
 
 export default class FlatListView extends Component{
     constructor(props){
         super(props);
-        this.state={
+        this.state=({
             deleteRowKey:null
-        }
+        });
+        this._onPressAdd = this._onPressAdd().bind(this);
     }
     refreshFlatList = (delKey) => {
         this.setState((prevState)=>{
@@ -116,9 +118,10 @@ export default class FlatListView extends Component{
                 deleteRowKey: delKey
             }
         })
-    }
+    };
     _onPressAdd(){
-        alert('Add');
+        // alert('Add');
+      this.refs.addModal.showAddModal();
     }
     render(){
         return(
@@ -150,7 +153,12 @@ export default class FlatListView extends Component{
                             <ListItemCOmponent item={item} index={index} parentFlatList = {this}/>
                         );
                     }}
-                ></FlatList>
+                >
+
+                </FlatList>
+                <AddModal ref={'addModal'} parentFlatList={this}>
+
+                </AddModal>
             </View>
         );
     }
